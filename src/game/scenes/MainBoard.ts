@@ -1,11 +1,12 @@
 import Phaser from 'phaser';
 import cardsData from '../../data/cards.json';
 import fusionsData from '../../data/fusions.json';
-import { selectedCard } from '../../store';
+import { selectedCard, currentTurn } from '../../store';
 
 export class MainBoard extends Phaser.Scene {
-    private boardZone!: Phaser.GameObjects.Zone;
+    private boardSlots: Phaser.GameObjects.Zone[] = [];
     private handCards: Phaser.GameObjects.Container[] = [];
+    private isFirstTurn: boolean = true;
 
     // Cast JSON to explicit dictionary type to satisfy TypeScript
     private fusionsDict: Record<string, string> = fusionsData;
@@ -35,21 +36,39 @@ export class MainBoard extends Phaser.Scene {
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
 
-        // 1. ZONES SETUP
-        const boardWidth = 600;
-        const boardHeight = 300;
-        const boardX = width / 2;
+        // ----------------------------------------------------
+        // 1. ZONES SETUP (5 BATTLEFIELD SLOTS)
+        // ----------------------------------------------------
+        
+        const slotWidth = 200 * 0.8; // 160
+        const slotHeight = 300 * 0.8; // 240
+        const slotGap = 20;
+        const totalSlots = 5;
+        
+        const totalBoardWidth = (totalSlots * slotWidth) + ((totalSlots - 1) * slotGap);
+        const boardStartX = (width / 2) - (totalBoardWidth / 2) + (slotWidth / 2);
         const boardY = height / 2 - 50;
 
-        const boardGraphics = this.add.graphics();
-        boardGraphics.lineStyle(4, 0x34495e, 0.5);
-        boardGraphics.strokeRoundedRect(boardX - boardWidth/2, boardY - boardHeight/2, boardWidth, boardHeight, 15);
-        this.add.text(boardX, boardY, 'BATTLEFIELD', { 
-            fontSize: '28px', color: '#34495e', fontStyle: 'bold' 
-        }).setOrigin(0.5).setAlpha(0.3);
+        for (let i = 0; i < totalSlots; i++) {
+            const x = boardStartX + i * (slotWidth + slotGap);
+            const y = boardY;
 
-        this.boardZone = this.add.zone(boardX, boardY, boardWidth, boardHeight)
-            .setRectangleDropZone(boardWidth, boardHeight);
+            // Visual graphics for the slot
+            const slotGraphics = this.add.graphics();
+            slotGraphics.lineStyle(2, 0x34495e, 0.6);
+            slotGraphics.strokeRoundedRect(x - slotWidth/2, y - slotHeight/2, slotWidth, slotHeight, 10);
+            
+            // Text placeholder
+            this.add.text(x, y, 'SLOT', { 
+                fontSize: '16px', color: '#34495e', fontStyle: 'bold' 
+            }).setOrigin(0.5).setAlpha(0.3);
+            
+            // Drop Zone
+            const zone = this.add.zone(x, y, slotWidth, slotHeight).setRectangleDropZone(slotWidth, slotHeight);
+            zone.setData('occupiedBy', null);
+            
+            this.boardSlots.push(zone);
+        }
 
         const handY = height - 150;
         const handGraphics = this.add.graphics();
@@ -68,7 +87,25 @@ export class MainBoard extends Phaser.Scene {
         // Align them properly now that they are in the array
         this.realignHand();
 
-        // 3. GLOBAL DRAG EVENTS & FUSION LOGIC
+        // 3. STORE SUBSCRIPTION (TURN LOGIC)
+        const unsubscribe = currentTurn.subscribe(turn => {
+            if (turn === 'enemy') {
+                this.handleEnemyTurn();
+            } else if (turn === 'player') {
+                if (this.isFirstTurn) {
+                    this.isFirstTurn = false; // Skip drawing on absolute first load
+                } else {
+                    this.handlePlayerTurnStart();
+                }
+            }
+        });
+
+        // Prevent memory leak on scene restart/shutdown
+        this.events.on('shutdown', () => {
+            unsubscribe();
+        });
+
+        // 4. GLOBAL DRAG EVENTS & FUSION LOGIC
         this.input.on('dragstart', (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Container) => {
             gameObject.setData('isDragging', true);
             gameObject.setDepth(100); 
@@ -107,18 +144,32 @@ export class MainBoard extends Phaser.Scene {
         });
 
         this.input.on('drop', (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Container, dropZone: Phaser.GameObjects.Zone) => {
-            if (dropZone === this.boardZone) {
-                gameObject.setData('isPlayed', true);
-                
-                this.tweens.add({
-                    targets: gameObject,
-                    x: dropZone.x,
-                    y: dropZone.y,
-                    scale: 0.95, 
-                    depth: 10, 
-                    duration: 300,
-                    ease: 'Back.easeOut'
-                });
+            if (this.boardSlots.includes(dropZone)) {
+                // Check if slot is occupied
+                if (dropZone.getData('occupiedBy')) {
+                    this.returnCardToHand(gameObject);
+                } else {
+                    // Empty slot -> Snap!
+                    dropZone.setData('occupiedBy', gameObject);
+                    gameObject.setData('inPlay', true);
+                    
+                    // Remove from hand and realign remaining cards
+                    this.handCards = this.handCards.filter(c => c !== gameObject);
+                    this.realignHand();
+                    
+                    // Disable dragging now that it's on the board
+                    this.input.setDraggable(gameObject, false);
+                    
+                    this.tweens.add({
+                        targets: gameObject,
+                        x: dropZone.x,
+                        y: dropZone.y,
+                        scale: 0.8, // Match slot scale
+                        depth: 10, 
+                        duration: 300,
+                        ease: 'Back.easeOut'
+                    });
+                }
             } else {
                 this.returnCardToHand(gameObject);
             }
@@ -126,7 +177,55 @@ export class MainBoard extends Phaser.Scene {
     }
 
     // ----------------------------------------------------
-    // HELPERS & FUSION LOGIC
+    // TURN LOGIC & HELPERS
+    // ----------------------------------------------------
+
+    private handleEnemyTurn() {
+        console.log("Turno do Inimigo!");
+        
+        // Disable drag on player's hand cards
+        this.handCards.forEach(card => {
+            this.input.setDraggable(card, false);
+        });
+
+        // Simulate AI thinking for 2 seconds
+        this.time.delayedCall(2000, () => {
+            console.log("Inimigo terminou o turno.");
+            // Pass turn back to player via Svelte Store
+            currentTurn.set('player');
+        });
+    }
+
+    private handlePlayerTurnStart() {
+        console.log("Turno do Jogador!");
+        
+        // Re-enable drag on hand cards
+        this.handCards.forEach(card => {
+            this.input.setDraggable(card, true);
+        });
+
+        this.drawCard();
+    }
+
+    private drawCard() {
+        // Only draw playable cards, not fusion results
+        const playableCards = cardsData.filter(c => c.id !== 'card_004');
+        const randomIndex = Phaser.Math.Between(0, playableCards.length - 1);
+        const randomCardData = playableCards[randomIndex];
+        
+        const width = this.cameras.main.width;
+        const handY = this.cameras.main.height - 150;
+        
+        // Instantiate the new card off-screen to the right
+        const newContainer = this.createCardContainer(randomCardData, width + 200, handY);
+        this.handCards.push(newContainer);
+        
+        // Call realignHand to animate it sliding into place
+        this.realignHand();
+    }
+
+    // ----------------------------------------------------
+    // FUSION LOGIC
     // ----------------------------------------------------
 
     private createCardContainer(card: any, x: number, y: number): Phaser.GameObjects.Container {

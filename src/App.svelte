@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import { initGame } from './game/GameManager';
   import CardHUD from './ui/CardHUD.svelte';
+  import TurnIndicator from './ui/TurnIndicator.svelte';
 
   let gameInstance: Phaser.Game;
 
@@ -21,6 +22,7 @@
   <!-- Svelte UI Layer (Overlays) -->
   <div class="absolute inset-0 pointer-events-none z-10">
     <CardHUD />
+    <TurnIndicator />
     
     <header class="absolute top-0 left-0 w-full p-4 pointer-events-auto">
       <h1 class="text-3xl font-bold text-yellow-500 drop-shadow-md">Pactum</h1>
