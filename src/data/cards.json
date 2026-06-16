@@ -7,6 +7,35 @@
     "cost": 4,
     "atk": 1800,
     "def": 1500,
+    "fusion_tags": ["Warrior", "Light"],
+    "visuals": {
+      "template": "/src/assets/templates/standard_light.svg",
+      "art": "/src/assets/art/prism_knight.svg"
+    }
+  },
+  {
+    "id": "card_002",
+    "name": "Fera das Brasas",
+    "element": "Fire",
+    "type": "Beast",
+    "cost": 3,
+    "atk": 1200,
+    "def": 800,
+    "fusion_tags": ["Beast", "Fire"],
+    "visuals": {
+      "template": "/src/assets/templates/standard_light.svg",
+      "art": "/src/assets/art/prism_knight.svg"
+    }
+  },
+  {
+    "id": "card_003",
+    "name": "Aprendiz Sombrio",
+    "element": "Dark",
+    "type": "Spellcaster",
+    "cost": 2,
+    "atk": 900,
+    "def": 1100,
+    "fusion_tags": ["Human", "Magic"],
     "visuals": {
       "template": "/src/assets/templates/standard_light.svg",
       "art": "/src/assets/art/prism_knight.svg"
