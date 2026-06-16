@@ -24,7 +24,7 @@
     "fusion_tags": ["Beast", "Fire"],
     "visuals": {
       "template": "/src/assets/templates/standard_light.svg",
-      "art": "/src/assets/art/prism_knight.svg"
+      "art": "/src/assets/art/ember_beast.svg"
     }
   },
   {
@@ -38,7 +38,21 @@
     "fusion_tags": ["Human", "Magic"],
     "visuals": {
       "template": "/src/assets/templates/standard_light.svg",
-      "art": "/src/assets/art/prism_knight.svg"
+      "art": "/src/assets/art/dark_apprentice.svg"
+    }
+  },
+  {
+    "id": "card_004",
+    "name": "Centauro em Chamas",
+    "element": "Fire",
+    "type": "Beast-Warrior",
+    "cost": 5,
+    "atk": 2100,
+    "def": 1800,
+    "fusion_tags": ["Beast-Warrior", "Fire"],
+    "visuals": {
+      "template": "/src/assets/templates/standard_light.svg",
+      "art": "/src/assets/art/flame_centaur.svg"
     }
   }
 ]

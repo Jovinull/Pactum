@@ -1,0 +1,30 @@
+<svg width="160" height="160" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="magic-glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <radialGradient id="orb-grad" cx="40%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#e056fd"/>
+      <stop offset="60%" stop-color="#8e44ad"/>
+      <stop offset="100%" stop-color="#2c3e50"/>
+    </radialGradient>
+  </defs>
+  
+  <rect width="160" height="160" rx="5" fill="#0d0510"/>
+  
+  <!-- Magic Circle -->
+  <g stroke="#9b59b6" stroke-width="2" fill="none" filter="url(#magic-glow)" opacity="0.6">
+    <circle cx="80" cy="80" r="60"/>
+    <circle cx="80" cy="80" r="45"/>
+    <polygon points="80,20 132,110 28,110"/>
+    <polygon points="80,140 28,50 132,50"/>
+  </g>
+  
+  <!-- Black Staff -->
+  <rect x="75" y="40" width="10" height="110" fill="#111" rx="2" stroke="#4a235a" stroke-width="2"/>
+  
+  <!-- Arcane Orb -->
+  <circle cx="80" cy="40" r="16" fill="url(#orb-grad)" filter="url(#magic-glow)"/>
+  <circle cx="75" cy="35" r="4" fill="#ffffff" opacity="0.8" filter="url(#magic-glow)"/>
+</svg>
