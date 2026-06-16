@@ -1,0 +1,11 @@
+[
+  {
+    "id": "card_001",
+    "name": "Cavaleiro de Prisma",
+    "element": "Light",
+    "type": "Warrior",
+    "cost": 4,
+    "atk": 1800,
+    "def": 1500
+  }
+]
