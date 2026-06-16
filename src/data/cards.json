@@ -6,6 +6,10 @@
     "type": "Warrior",
     "cost": 4,
     "atk": 1800,
-    "def": 1500
+    "def": 1500,
+    "visuals": {
+      "template": "/src/assets/templates/standard_light.svg",
+      "art": "/src/assets/art/prism_knight.svg"
+    }
   }
 ]

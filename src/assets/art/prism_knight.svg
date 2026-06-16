@@ -1,0 +1,12 @@
+<svg width="160" height="160" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="160" height="160" rx="5" fill="#2c3e50"/>
+  
+  <!-- Crystal Geometry -->
+  <polygon points="80,20 130,80 80,140 30,80" fill="#f1c40f" stroke="#ffffff" stroke-width="3"/>
+  <polygon points="80,20 80,140 130,80" fill="#f39c12" fill-opacity="0.8"/>
+  
+  <!-- Floating Energy -->
+  <circle cx="80" cy="80" r="15" fill="#9b59b6" fill-opacity="0.9"/>
+  <circle cx="80" cy="80" r="8" fill="#ecf0f1"/>
+</svg>
